@@ -1,19 +1,20 @@
-CREATE TABLE IF NOT EXISTS users (
-    user_id INT AUTO_INCREMENT PRIMARY KEY,
-    business_id INT,
-    email VARCHAR(255) UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (business_id) REFERENCES business(business_id) ON DELETE SET NULL
-);
-
 CREATE TABLE IF NOT EXISTS business (
     business_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
     email VARCHAR(255),
-    phone_number VARCHAR(15) UNIQUE
+    phone_number VARCHAR(20) UNIQUE
 );
+
+CREATE TABLE IF NOT EXISTS user (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    business_id INT,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (business_id) REFERENCES business(business_id) ON DELETE SET NULL
+);
+
 
 CREATE TABLE IF NOT EXISTS device (
     device_id INT AUTO_INCREMENT PRIMARY KEY,
