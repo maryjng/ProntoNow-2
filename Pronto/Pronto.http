@@ -1,0 +1,6 @@
+@Pronto_HostAddress = http://localhost:5063
+
+GET {{Pronto_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
