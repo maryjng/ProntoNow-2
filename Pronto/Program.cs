@@ -1,13 +1,40 @@
+using Pronto.Models;
+using Pronto.Data;
+using Pronto.Repositories;
 using System;
 using System.Data;
 using MySql.Data.MySqlClient;
 using Microsoft.Extensions.Configuration;
 
-var config = new ConfigurationBuilder()
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .Build();
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        CreateHostBuilder(args).Build().Run();
+    }
 
-string connectionString = config.GetConnectionString("DefaultConnection");
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.ConfigureServices(services =>
+                {
+                    // Register UserRepository
+                    services.AddScoped<UserRepository>();
 
-Console.WriteLine($"Database Connection String: {connectionString}"); // For testing purposes
+                    // Register DatabaseHelper
+                    services.AddSingleton<DatabaseHelper>();
+
+                    services.AddControllers();
+                });
+
+                webBuilder.Configure(app =>
+                {
+                    app.UseRouting();
+                    app.UseEndpoints(endpoints =>
+                    {
+                        endpoints.MapControllers();
+                    });
+                });
+            });
+}
