@@ -22,8 +22,12 @@ public class Program
                     // Register UserRepository
                     services.AddScoped<UserRepository>();
 
+                    // Register DeviceRepository
+                    services.AddScoped<DeviceRepository>();
+
                     // Register DatabaseHelper
                     services.AddSingleton<DatabaseHelper>();
+
 
                     services.AddControllers();
                 });
