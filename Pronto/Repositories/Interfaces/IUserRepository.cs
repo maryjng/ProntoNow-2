@@ -1,4 +1,5 @@
 using Pronto.Models;
+using Pronto.DTOs;
 using System.Threading.Tasks;
 
 namespace Pronto.Repositories.Interfaces
@@ -7,6 +8,6 @@ namespace Pronto.Repositories.Interfaces
     {
         Task<ApiResponse<User>> CreateUserAsync(User user);
         Task<ApiResponse<User>> GetUserByIdAsync(int userId);
-        Task<ApiResponse<User>> UpdateUserAsync(int userId, User updatedUser);
+        Task<ApiResponse<User>> UpdateUserAsync(int userId, UserUpdateDTO updatedUserDTO);
     }
 }

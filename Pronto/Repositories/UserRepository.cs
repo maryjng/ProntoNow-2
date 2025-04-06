@@ -2,6 +2,7 @@ using Pronto.Models;
 using Pronto.Data;
 using Dapper;
 using Pronto.Repositories.Interfaces;
+using Pronto.DTOs;
 using System;
 using System.Threading.Tasks;
 
@@ -69,7 +70,7 @@ namespace Pronto.Repositories
             };
         }
 
-        public async Task<ApiResponse<User>> UpdateUserAsync(int userId, User updatedUser)
+        public async Task<ApiResponse<User>> UpdateUserAsync(int userId, UserUpdateDTO updatedUserDTO)
         {
             using var connection = _databaseHelper.CreateConnection();
             var userExists = await connection.QuerySingleOrDefaultAsync<User>("SELECT * FROM user WHERE UserId=@UserId", new { UserId = userId });
@@ -84,9 +85,13 @@ namespace Pronto.Repositories
                 };
             }
 
+            userExists.Email = updatedUserDTO.Email ?? userExists.Email;
+            userExists.PasswordHash = updatedUserDTO.PasswordHash ?? userExists.PasswordHash;
+            userExists.BusinessId = updatedUserDTO.BusinessId ?? userExists.BusinessId;
+
             var sql = @"UPDATE user SET BusinessId = @BusinessId, Email = @Email, PasswordHash = @PasswordHash WHERE UserId = @UserId";
 
-            var rowsAffected = await connection.ExecuteAsync(sql, updatedUser);
+            var rowsAffected = await connection.ExecuteAsync(sql, userExists);
 
             if (rowsAffected == 0)
             {
@@ -100,10 +105,10 @@ namespace Pronto.Repositories
 
             var updatedUserWithoutPassword = new User
             {
-                UserId = updatedUser.UserId,
-                BusinessId = updatedUser.BusinessId,
-                Email = updatedUser.Email,
-                CreatedAt = updatedUser.CreatedAt,
+                UserId = userExists.UserId,
+                BusinessId = userExists.BusinessId,
+                Email = userExists.Email,
+                CreatedAt = userExists.CreatedAt,
             }; // do not include PasswordHash field in return user
 
             return new ApiResponse<User>

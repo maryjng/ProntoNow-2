@@ -5,6 +5,7 @@ using System.Data;
 using System.Threading.Tasks;
 using Pronto.Models;
 using Pronto.Repositories;
+using Pronto.DTOs;
 using System.Net;
 
 namespace Pronto.Controllers
@@ -51,14 +52,9 @@ namespace Pronto.Controllers
         }
 
         [HttpPatch("{userId}")]
-        public async Task<IActionResult> UpdateUser(int userId, [FromBody] User updatedUser)
+        public async Task<IActionResult> UpdateUser(int userId, UserUpdateDTO userUpdateDTO)
         {
-            if (updatedUser == null)
-            {
-                return BadRequest("Invalid user data.");
-            }
-
-            var resp = await _userRepository.UpdateUserAsync(userId, updatedUser);
+            var resp = await _userRepository.UpdateUserAsync(userId, userUpdateDTO);
 
             if (!resp.Success)
             {
