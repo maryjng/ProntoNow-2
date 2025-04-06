@@ -19,7 +19,6 @@ namespace Pronto.Controllers
             _userRepository = userRepository;
         }
 
-        //private IDbConnection CreateConnection() => new MySqlConnection(_connectionString);
 
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] User user)
