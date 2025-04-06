@@ -5,8 +5,8 @@ namespace Pronto.Repositories.Interfaces
 {
     public interface IUserRepository
     {
-        Task<int> CreateUserAsync(User user);
-        Task<User> GetUserByIdAsync(string email);
-
+        Task<ApiResponse<User>> CreateUserAsync(User user);
+        Task<ApiResponse<User>> GetUserByIdAsync(int userId);
+        Task<ApiResponse<User>> UpdateUserAsync(int userId, User updatedUser);
     }
 }
