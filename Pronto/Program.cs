@@ -19,13 +19,10 @@ public class Program
             {
                 webBuilder.ConfigureServices(services =>
                 {
-                    // Register UserRepository
                     services.AddScoped<UserRepository>();
-
-                    // Register DeviceRepository
                     services.AddScoped<DeviceRepository>();
+                    services.AddScoped<BusinessRepository>();
 
-                    // Register DatabaseHelper
                     services.AddSingleton<DatabaseHelper>();
 
 

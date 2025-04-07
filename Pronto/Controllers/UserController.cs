@@ -25,28 +25,14 @@ namespace Pronto.Controllers
         public async Task<IActionResult> GetUser(int id)
         {
             var resp = await _userRepository.GetUserByIdAsync(id);
-            if (!resp.Success)
-            {
-                return StatusCode(resp.StatusCode, resp);
-            }
 
-            return Ok(resp);
+            return StatusCode(resp.StatusCode, resp);
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] User user)
         {
-            if (user == null)
-            {
-                return BadRequest();
-            }
-
             var resp = await _userRepository.CreateUserAsync(user);
-
-            if (!resp.Success)
-            {
-                return StatusCode(resp.StatusCode, resp);
-            }
 
             return StatusCode(resp.StatusCode, resp);
         }
@@ -55,11 +41,6 @@ namespace Pronto.Controllers
         public async Task<IActionResult> UpdateUser(int userId, UserUpdateDTO userUpdateDTO)
         {
             var resp = await _userRepository.UpdateUserAsync(userId, userUpdateDTO);
-
-            if (!resp.Success)
-            {
-                return StatusCode(resp.StatusCode, resp);
-            }
 
             return StatusCode(resp.StatusCode, resp);
         }
