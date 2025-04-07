@@ -1,8 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Dapper;
-using MySql.Data.MySqlClient;
-using System.Data;
-using System.Threading.Tasks;
 using Pronto.Models;
 using Pronto.Repositories;
 using Pronto.DTOs;

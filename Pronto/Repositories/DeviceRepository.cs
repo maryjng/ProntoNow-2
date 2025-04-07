@@ -13,22 +13,57 @@ namespace Pronto.Repositories
             _databaseHelper = databaseHelper;
         }
 
-        public async Task<Device> GetDeviceByIdAsync(int deviceId)
+        public async Task<ApiResponse<Device>> GetDeviceByIdAsync(int deviceId)
         {
             using var connection = _databaseHelper.CreateConnection();
-            var sql = @"SELECT device_id as DeviceId, business_id as BusinessId, make as Make, model as Model, serial_number as SerialNumber FROM device WHERE device_id = @DeviceId";
+            var sql = @"SELECT DeviceId, BusinessId, Make, Model, SerialNumber FROM device WHERE device_id = @DeviceId";
             var device = await connection.QuerySingleOrDefaultAsync<Device>(sql, new { DeviceId = deviceId });
-            return device;
+            
+            if (device == null)
+            {
+                return new ApiResponse<Device>
+                {
+                    Success = false,
+                    ErrorMessage = "Device not found.",
+                    StatusCode = 404
+                };
+            }
+
+            return new ApiResponse<Device>
+            {
+                Success = true,
+                Data = device,
+                StatusCode = 200
+            };
         }
 
-        public async Task<int> CreateDeviceAsync(Device device)
+        public async Task<ApiResponse<Device>> CreateDeviceAsync(Device device)
         {
             using var connection = _databaseHelper.CreateConnection();
             var sql = @"INSERT INTO device (device_id, business_id, make, model, serial_number)
                     VALUES (@DeviceId, @BusinessId, @Make, @Model, @SerialNumber);
                     SELECT LAST_INSERT_ID();";
 
-            return await connection.ExecuteScalarAsync<int>(sql, device);    
+            var deviceId =  await connection.ExecuteScalarAsync<int>(sql, device);
+
+            if (deviceId == 0)
+            {
+                return new ApiResponse<Device>
+                {
+                    Success = false,
+                    ErrorMessage = "Error creating device.",
+                    StatusCode = 500
+                };
+            }
+
+            device.DeviceId = deviceId;
+
+            return new ApiResponse<Device>
+            {
+                Success = true,
+                Data = device,
+                StatusCode = 200
+            };
         }
 
     }

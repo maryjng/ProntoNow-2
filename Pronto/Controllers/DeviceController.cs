@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Dapper;
-using MySql.Data.MySqlClient;
-using System.Data;
-using System.Threading.Tasks;
 using Pronto.Models;
 using Pronto.Repositories;
+using Pronto.DTOs;
 
 namespace Pronto.Controllers
 {
@@ -22,26 +20,17 @@ namespace Pronto.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDevice(int id)
         {
-            var device = await _deviceRepository.GetDeviceByIdAsync(id);
-            if (device == null)
-            {
-                return NotFound();
-             }
+            var resp = await _deviceRepository.GetDeviceByIdAsync(id);
 
-            return Ok(device);
+            return StatusCode(resp.StatusCode, resp);
         }
 
 
         public async Task<IActionResult> CreateDevice([FromBody] Device device)
         {
-            if (device == null)
-            {
-                return BadRequest();
-            }
+            var resp = await _deviceRepository.CreateDeviceAsync(device);
 
-            var deviceId = await _deviceRepository.CreateDeviceAsync(device);
-
-            return CreatedAtAction(nameof(GetDevice), new { id = deviceId }, device);
+            return StatusCode(resp.StatusCode, resp);
         }
 
         // UPDATE device

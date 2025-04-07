@@ -1,9 +1,7 @@
 using MySql.Data.MySqlClient;
 using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
 using System.Data;
-using System.Threading.Tasks;
-using Microsoft.Win32;
+
 
 namespace Pronto.Data
 {
