@@ -1,10 +1,12 @@
 using Pronto.Models;
 using Pronto.Data;
 using Dapper;
+using Pronto.Repositories.Interfaces;
+using Pronto.DTOs;
 
 namespace Pronto.Repositories
 {
-    public class DeviceRepository 
+    public class DeviceRepository : IDeviceRepository
     { 
         private readonly DatabaseHelper _databaseHelper;
 
@@ -66,5 +68,9 @@ namespace Pronto.Repositories
             };
         }
 
+        public Task<ApiResponse<Device>> UpdateDeviceAsync(int deviceId, DeviceUpdateDTO updatedDeviceDTO)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

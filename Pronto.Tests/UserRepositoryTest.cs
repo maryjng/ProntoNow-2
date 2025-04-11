@@ -1,50 +1,78 @@
 using Xunit;
 using Dapper;
-using Pronto.Models;
+using Moq;
+using System.Data;
 using Pronto.Repositories;
-using System.Threading.Tasks;
-using System.Net.Sockets;
+using Pronto.Data;
+using Pronto.Models;
+using FluentAssertions;
 
-public class UserRepositoryTest : RepositoryTestBase
+namespace Pronto.Tests;
+
+public class UserRepositoryTests
 {
-    private readonly UserRepository _userRepository;
+    private readonly Mock<UserRepository> _sut;
 
-    public UserRepositoryTest() : base()
+    private readonly Mock<IDbConnection> _dbConnection = new();
+    private readonly Mock<IDatabaseHelper> _databaseHelper = new();
+
+    public UserRepositoryTests()
     {
-        _userRepository = new UserRepository(new DatabaseHelper(Configuration));
+        _sut = new Mock<UserRepository>(() => new UserRepository(_databaseHelper.Object));
+        _sut.CallBase = true;
+
+        _databaseHelper
+            .Setup(s => s.CreateConnection())
+            .Returns(_dbConnection.Object);
     }
 
     [Fact]
-    public void CreateUser_SavesToDatabase()
+    public async Task GetUserByIdAsync_ReturnsUser_WhenUserExists()
     {
-        var business = new Business
+        // Arrange
+        var userId = 1;
+        var expectedUser = new User
         {
-            Name = "Business Name",
-            Address = "123 Business Address",
-            Email = "testbusiness@example.com",
-            PhoneNumber = "555-1234"
+            UserId = userId,
+            Email = "test@example.com",
+            BusinessId = 123,
+            PasswordHash = "hash",
+            CreatedAt = DateTime.UtcNow
         };
 
-        var businessId = _connection.ExecuteScalar<int>(
-        "INSERT INTO business (Name, Address, Email, PhoneNumber) VALUES (@Name, @Address, @Email, @PhoneNumber); SELECT LAST_INSERT_ID();", business);
+        _sut
+            .Setup(repo => repo.QuerySingleOrDefaultAsync<User>(
+                It.IsAny<IDbConnection>(),
+                It.IsAny<string>(),
+                It.IsAny<object>()))
+            .ReturnsAsync(expectedUser);
 
+        // Act
+        var result = await _sut.Object.GetUserByIdAsync(userId);
 
-        var user = new User 
-        { 
-            BusinessId = businessId, 
-            Email = "test@example.com", 
-            PasswordHash = "hashedPW"
-        };
+        // Assert
+        result.Success.Should().BeTrue("We expect the API response to have returned true with a valid user");
+        expectedUser.Should().BeEquivalentTo(result.Data, "The expected user that was mocked should have been wrapped in the API response");
+    }
 
-        var userId = _connection.ExecuteScalar<int>(
-               "INSERT INTO user (BusinessId, Email, PasswordHash) VALUES (@BusinessId, @Email, @PasswordHash); SELECT LAST_INSERT_ID();", user);
+    [Fact]
+    public async Task GetUserByIdAsync_ReturnsError_WhenNoUserExists()
+    {
+        // Arrange
+        _sut
+            .Setup(repo => repo.QuerySingleOrDefaultAsync<User>(
+                It.IsAny<IDbConnection>(),
+                It.IsAny<string>(),
+                It.IsAny<object>()))
+            .ReturnsAsync(() => null);
 
-        var savedUser = _connection.QuerySingleOrDefault<User>(
-            "SELECT * FROM user WHERE UserId = @UserId", new { UserId = userId });
+        // Act
+        var result = await _sut.Object.GetUserByIdAsync(1);
 
-        Assert.NotNull(savedUser);
-        Assert.Equal(user.Email, savedUser.Email);
-        Assert.Equal(user.BusinessId, savedUser.BusinessId);
-        //Assert.AreEqual(user.CreatedAt.Date, savedUser.CreatedAt.Date);
+        // Assert
+        result.Success.Should().BeFalse("We expect the API response to have returned false with an invalid user");
+        result.ErrorMessage.Should().Be("User not found.");
+        result.StatusCode.Should().Be(404, "The user wasn't found so a 404 should be returned");
+        result.Data.Should().BeNull("We don't expect any user data to be present");
     }
 }

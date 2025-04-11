@@ -5,7 +5,7 @@ using System.Data;
 
 namespace Pronto.Data
 {
-    public class DatabaseHelper
+    public class DatabaseHelper : IDatabaseHelper
     {
         private readonly string _connectionString;
 
@@ -14,7 +14,7 @@ namespace Pronto.Data
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public MySqlConnection CreateConnection()
+        public IDbConnection CreateConnection()
         {
             return new MySqlConnection(_connectionString);
         }
