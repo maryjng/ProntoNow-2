@@ -3,7 +3,6 @@ using Dapper;
 using Pronto.Models;
 using Pronto.Repositories;
 using Pronto.DTOs;
-using System.Net;
 
 namespace Pronto.Controllers
 {

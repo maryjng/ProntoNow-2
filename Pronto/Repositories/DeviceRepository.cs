@@ -18,7 +18,7 @@ namespace Pronto.Repositories
         public async Task<ApiResponse<Device>> GetDeviceByIdAsync(int deviceId)
         {
             using var connection = _databaseHelper.CreateConnection();
-            var sql = @"SELECT DeviceId, BusinessId, Make, Model, SerialNumber FROM device WHERE device_id = @DeviceId";
+            var sql = @"SELECT DeviceId, BusinessId, Make, Model, SerialNumber FROM device WHERE DeviceId = @DeviceId";
             var device = await connection.QuerySingleOrDefaultAsync<Device>(sql, new { DeviceId = deviceId });
             
             if (device == null)
@@ -42,8 +42,8 @@ namespace Pronto.Repositories
         public async Task<ApiResponse<Device>> CreateDeviceAsync(Device device)
         {
             using var connection = _databaseHelper.CreateConnection();
-            var sql = @"INSERT INTO device (device_id, business_id, make, model, serial_number)
-                    VALUES (@DeviceId, @BusinessId, @Make, @Model, @SerialNumber);
+            var sql = @"INSERT INTO device (BusinessId, Make, Model, SerialNumber)
+                    VALUES (@BusinessId, @Make, @Model, @SerialNumber);
                     SELECT LAST_INSERT_ID();";
 
             var deviceId =  await connection.ExecuteScalarAsync<int>(sql, device);
@@ -68,9 +68,46 @@ namespace Pronto.Repositories
             };
         }
 
-        public Task<ApiResponse<Device>> UpdateDeviceAsync(int deviceId, DeviceUpdateDTO updatedDeviceDTO)
+        public async Task<ApiResponse<Device>> UpdateDeviceAsync(int deviceId, DeviceUpdateDTO updatedDeviceDTO)
         {
-            throw new NotImplementedException();
+            using var connection = _databaseHelper.CreateConnection();
+            var deviceExists = await connection.QuerySingleOrDefaultAsync<Device>("SELECT * FROM device WHERE deviceId=@DeviceId", new { DeviceId = deviceId });
+
+            if (deviceExists == null)
+            {
+                return new ApiResponse<Device>
+                {
+                    Success = false,
+                    ErrorMessage = "Device not found.",
+                    StatusCode = 404
+                };
+            }
+
+            deviceExists.BusinessId = updatedDeviceDTO.BusinessId ?? deviceExists.BusinessId;
+            deviceExists.Make = updatedDeviceDTO.Make ?? deviceExists.Make;
+            deviceExists.Model = updatedDeviceDTO.Model ?? deviceExists.Model;
+            deviceExists.SerialNumber = updatedDeviceDTO.SerialNumber ?? deviceExists.SerialNumber;
+
+            var sql = @"UPDATE device SET BusinessId = @BusinessId, Make = @Make, Model = @Model, SerialNumber = @SerialNumber WHERE DeviceId = @DeviceId  AND (BusinessId != @BusinessId OR Make != @Make OR Model != @Model OR SerialNumber != @SerialNumber)";
+
+            var rowsAffected = await connection.ExecuteAsync(sql, deviceExists);
+
+            if (rowsAffected == 0)
+            {
+                return new ApiResponse<Device>
+                {
+                    Success = false,
+                    ErrorMessage = "No changes were made. The data was already up-to-date.",
+                    StatusCode = 200
+                };
+            }
+
+            return new ApiResponse<Device>
+            {
+                Success = true,
+                Data = deviceExists,
+                StatusCode = 200
+            };
         }
     }
 }

@@ -1,10 +1,5 @@
-using Pronto.Models;
 using Pronto.Data;
 using Pronto.Repositories;
-using System;
-using System.Data;
-using MySql.Data.MySqlClient;
-using Microsoft.Extensions.Configuration;
 
 public class Program
 {
@@ -22,6 +17,8 @@ public class Program
                     services.AddScoped<UserRepository>();
                     services.AddScoped<DeviceRepository>();
                     services.AddScoped<BusinessRepository>();
+                    services.AddScoped<ReportRepository>();
+                    services.AddScoped<IDatabaseHelper, DatabaseHelper>();
 
                     services.AddSingleton<DatabaseHelper>();
 

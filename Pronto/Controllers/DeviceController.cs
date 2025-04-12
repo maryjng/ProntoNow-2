@@ -3,6 +3,7 @@ using Dapper;
 using Pronto.Models;
 using Pronto.Repositories;
 using Pronto.DTOs;
+using Pronto.Repositories.Interfaces;
 
 namespace Pronto.Controllers
 {
@@ -25,7 +26,7 @@ namespace Pronto.Controllers
             return StatusCode(resp.StatusCode, resp);
         }
 
-
+        [HttpPost]
         public async Task<IActionResult> CreateDevice([FromBody] Device device)
         {
             var resp = await _deviceRepository.CreateDeviceAsync(device);
@@ -33,6 +34,12 @@ namespace Pronto.Controllers
             return StatusCode(resp.StatusCode, resp);
         }
 
-        // UPDATE device
+        [HttpPatch("{deviceId}")]
+        public async Task<IActionResult> UpdateDevice(int deviceId, DeviceUpdateDTO deviceUpdateDTO)
+        {
+            var resp = await _deviceRepository.UpdateDeviceAsync(deviceId, deviceUpdateDTO);
+
+            return StatusCode(resp.StatusCode, resp);
+        }
     }
 }

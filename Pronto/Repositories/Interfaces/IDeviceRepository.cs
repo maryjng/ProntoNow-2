@@ -1,6 +1,5 @@
 ﻿using Pronto.Models;
 using Pronto.DTOs;
-using System.Threading.Tasks;
 
 namespace Pronto.Repositories.Interfaces
 {

@@ -5,128 +5,128 @@ using Pronto.Repositories.Interfaces;
 using Pronto.DTOs;
 using System.Data;
 
-namespace Pronto.Repositories;
-
-public class UserRepository : IUserRepository
+namespace Pronto.Repositories
 {
-    private readonly IDatabaseHelper _databaseHelper;
-
-    public UserRepository(IDatabaseHelper databaseHelper)
+    public class UserRepository : IUserRepository
     {
-        _databaseHelper = databaseHelper;
-    }
+        private readonly IDatabaseHelper _databaseHelper;
 
-    /// <summary>
-    /// This wraps the extension method so that we can moq the db doodickle.  This will need to be done for any, and all, extension method
-    /// calls to the database, where we need to mock their response.
-    /// </summary>
-    public virtual async Task<T?> QuerySingleOrDefaultAsync<T>(IDbConnection connection, string sql, object? param = null) =>
-        await connection.QuerySingleOrDefaultAsync<T>(sql, param);
-
-    public async Task<ApiResponse<User>> GetUserByIdAsync(int userId)
-    {
-        using var connection = _databaseHelper.CreateConnection();
-        var sql = "SELECT UserId, BusinessId, Email, PasswordHash, CreatedAt FROM user WHERE UserId = @UserId";
-
-        //var user = await connection.QuerySingleOrDefaultAsync<User>(sql, new { UserId = userId });
-        var user = await QuerySingleOrDefaultAsync<User>(connection, sql, new { UserId = userId });
-
-        if (user == null)
+        public UserRepository(IDatabaseHelper databaseHelper)
         {
-            return new ApiResponse<User>
-            {
-                Success = false,
-                ErrorMessage = "User not found.",
-                StatusCode = 404
-            };
+            _databaseHelper = databaseHelper;
         }
 
-        return new ApiResponse<User>
+        /// <summary>
+        /// This wraps the extension method so that we can moq the db doodickle.  This will need to be done for any, and all, extension method
+        /// calls to the database, where we need to mock their response.
+        /// </summary>
+        public virtual async Task<T?> QuerySingleOrDefaultAsync<T>(IDbConnection connection, string sql, object? param = null) =>
+            await connection.QuerySingleOrDefaultAsync<T>(sql, param);
+
+        public async Task<ApiResponse<User>> GetUserByIdAsync(int userId)
         {
-            Success = true,
-            Data = user,
-            StatusCode = 200
-        };
-    }
+            using var connection = _databaseHelper.CreateConnection();
+            var sql = "SELECT UserId, BusinessId, Email, PasswordHash, CreatedAt FROM user WHERE UserId = @UserId";
 
-    public async Task<ApiResponse<User>> CreateUserAsync(User user)
-    {
-        using var connection = _databaseHelper.CreateConnection();
-        var sql = @"INSERT INTO user (BusinessId, Email, PasswordHash) 
-                        VALUES (@BusinessId, @Email, @PasswordHash); 
-                        SELECT LAST_INSERT_ID();";
+            //var user = await connection.QuerySingleOrDefaultAsync<User>(sql, new { UserId = userId });
+            var user = await QuerySingleOrDefaultAsync<User>(connection, sql, new { UserId = userId });
 
-        var userId = await connection.ExecuteScalarAsync<int>(sql, user);
+            if (user == null)
+            {
+                return new ApiResponse<User>
+                {
+                    Success = false,
+                    ErrorMessage = "User not found.",
+                    StatusCode = 404
+                };
+            }
 
-        if (userId == 0)
-        {
             return new ApiResponse<User>
             {
-                Success = false,
-                ErrorMessage = "Error creating user.",
-                StatusCode = 500
-            };
-        }
-
-        user.UserId = userId;
-        return new ApiResponse<User>
-        {
-            Success = true,
-            Data = user,
-            StatusCode = 201
-        };
-    }
-
-    public async Task<ApiResponse<User>> UpdateUserAsync(int userId, UserUpdateDTO updatedUserDTO)
-    {
-        using var connection = _databaseHelper.CreateConnection();
-        var userExists = await connection.QuerySingleOrDefaultAsync<User>("SELECT * FROM user WHERE UserId=@UserId", new { UserId = userId });
-
-        if (userExists == null)
-        {
-            return new ApiResponse<User>
-            {
-                Success = false,
-                ErrorMessage = "User not found.",
-                StatusCode = 404
-            };
-        }
-
-        userExists.Email = updatedUserDTO.Email ?? userExists.Email;
-        userExists.PasswordHash = updatedUserDTO.PasswordHash ?? userExists.PasswordHash;
-        userExists.BusinessId = updatedUserDTO.BusinessId ?? userExists.BusinessId;
-
-        var sql = @"UPDATE user SET BusinessId = @BusinessId, Email = @Email, PasswordHash = @PasswordHash WHERE UserId = @UserId";
-
-        var rowsAffected = await connection.ExecuteAsync(sql, userExists);
-
-        if (rowsAffected == 0)
-        {
-            return new ApiResponse<User>
-            {
-                Success = false,
-                ErrorMessage = "No changes were made. The data was already up-to-date.",
+                Success = true,
+                Data = user,
                 StatusCode = 200
             };
         }
 
-        var updatedUserWithoutPassword = new User
+        public async Task<ApiResponse<User>> CreateUserAsync(User user)
         {
-            UserId = userExists.UserId,
-            BusinessId = userExists.BusinessId,
-            Email = userExists.Email,
-            CreatedAt = userExists.CreatedAt,
-        }; // do not include PasswordHash field in return user
+            using var connection = _databaseHelper.CreateConnection();
+            var sql = @"INSERT INTO user (BusinessId, Email, PasswordHash) 
+                        VALUES (@BusinessId, @Email, @PasswordHash); 
+                        SELECT LAST_INSERT_ID();";
 
-        return new ApiResponse<User>
+            var userId = await connection.ExecuteScalarAsync<int>(sql, user);
+
+            if (userId == 0)
+            {
+                return new ApiResponse<User>
+                {
+                    Success = false,
+                    ErrorMessage = "Error creating user.",
+                    StatusCode = 500
+                };
+            }
+
+            user.UserId = userId;
+            return new ApiResponse<User>
+            {
+                Success = true,
+                Data = user,
+                StatusCode = 201
+            };
+        }
+
+        public async Task<ApiResponse<User>> UpdateUserAsync(int userId, UserUpdateDTO updatedUserDTO)
         {
-            Success = true,
-            Data = updatedUserWithoutPassword,
-            StatusCode = 200
-        };
+            using var connection = _databaseHelper.CreateConnection();
+            var userExists = await connection.QuerySingleOrDefaultAsync<User>("SELECT * FROM user WHERE UserId=@UserId", new { UserId = userId });
+
+            if (userExists == null)
+            {
+                return new ApiResponse<User>
+                {
+                    Success = false,
+                    ErrorMessage = "User not found.",
+                    StatusCode = 404
+                };
+            }
+
+            userExists.Email = updatedUserDTO.Email ?? userExists.Email;
+            userExists.PasswordHash = updatedUserDTO.PasswordHash ?? userExists.PasswordHash;
+            userExists.BusinessId = updatedUserDTO.BusinessId ?? userExists.BusinessId;
+
+            var sql = @"UPDATE user SET BusinessId = @BusinessId, Email = @Email, PasswordHash = @PasswordHash WHERE UserId = @UserId AND (BusinessId != @BusinessId OR Email != @Email OR PasswordHash != @PasswordHash)";
+
+            var rowsAffected = await connection.ExecuteAsync(sql, userExists);
+
+            if (rowsAffected == 0)
+            {
+                return new ApiResponse<User>
+                {
+                    Success = false,
+                    ErrorMessage = "No changes were made. The data was already up-to-date.",
+                    StatusCode = 200
+                };
+            }
+
+            var updatedUserWithoutPassword = new User
+            {
+                UserId = userExists.UserId,
+                BusinessId = userExists.BusinessId,
+                Email = userExists.Email,
+                CreatedAt = userExists.CreatedAt,
+            }; // do not include PasswordHash field in return user
+
+            return new ApiResponse<User>
+            {
+                Success = true,
+                Data = updatedUserWithoutPassword,
+                StatusCode = 200
+            };
+        }
     }
 }
-
 
 //public class CacheConsumer
 //{
