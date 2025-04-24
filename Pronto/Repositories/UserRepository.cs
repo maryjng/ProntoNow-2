@@ -28,7 +28,6 @@ namespace Pronto.Repositories
             using var connection = _databaseHelper.CreateConnection();
             var sql = "SELECT UserId, BusinessId, Email, PasswordHash, CreatedAt FROM user WHERE UserId = @UserId";
 
-            //var user = await connection.QuerySingleOrDefaultAsync<User>(sql, new { UserId = userId });
             var user = await QuerySingleOrDefaultAsync<User>(connection, sql, new { UserId = userId });
 
             if (user == null)

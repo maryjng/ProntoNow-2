@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Pronto.Repositories.Interfaces;
 using Pronto.DTOs;
 using Pronto.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Pronto.Controllers
 {
@@ -43,6 +44,7 @@ namespace Pronto.Controllers
         }
 
         [HttpPatch("{userId}")]
+        [Authorize]
         public async Task<IActionResult> UpdateUser(int userId, UserUpdateDTO userUpdateDTO)
         {
             var resp = await _userRepository.UpdateUserAsync(userId, userUpdateDTO);
