@@ -49,6 +49,16 @@ namespace Pronto.Repositories
             };
         }
 
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            using var connection = _databaseHelper.CreateConnection();
+            var sql = "SELECT UserId, BusinessId, Email, PasswordHash, CreatedAt FROM user WHERE Email = @Email";
+
+            var user = await QuerySingleOrDefaultAsync<User>(connection, sql, new { Email = email });
+
+            return user;
+        }
+
         public async Task<ApiResponse<User>> CreateUserAsync(User user)
         {
             using var connection = _databaseHelper.CreateConnection();

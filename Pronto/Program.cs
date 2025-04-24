@@ -1,5 +1,7 @@
 using Pronto.Data;
 using Pronto.Repositories;
+using Pronto.Repositories.Interfaces;
+using Pronto.Services;
 
 public class Program
 {
@@ -18,9 +20,12 @@ public class Program
                     services.AddScoped<DeviceRepository>();
                     services.AddScoped<BusinessRepository>();
                     services.AddScoped<ReportRepository>();
+                    services.AddScoped<DatabaseHelper>();
                     services.AddScoped<IDatabaseHelper, DatabaseHelper>();
-
-                    services.AddSingleton<DatabaseHelper>();
+                    services.AddScoped<IUserRepository, UserRepository>();
+                    services.AddScoped<IUserService, UserService>();
+                    services.AddScoped<IPasswordHasherService, PasswordHasherService>();
+                    services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 
                     services.AddControllers();

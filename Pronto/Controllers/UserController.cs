@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Dapper;
-using Pronto.Models;
-using Pronto.Repositories;
+using Pronto.Repositories.Interfaces;
 using Pronto.DTOs;
+using Pronto.Services;
 
 namespace Pronto.Controllers
 {
@@ -10,10 +9,12 @@ namespace Pronto.Controllers
     [Route("api/users")]
     public class UserController : ControllerBase
     {
-        private readonly UserRepository _userRepository;
+        private readonly IUserService _userService;
+        private readonly IUserRepository _userRepository;
 
-        public UserController(UserRepository userRepository)
+        public UserController(IUserService userService, IUserRepository userRepository)
         {
+            _userService = userService;
             _userRepository = userRepository;
         }
 
@@ -25,10 +26,18 @@ namespace Pronto.Controllers
             return StatusCode(resp.StatusCode, resp);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateUser([FromBody] User user)
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] UserRegistrationDTO dto)
         {
-            var resp = await _userRepository.CreateUserAsync(user);
+            var resp = await _userService.RegisterUserAsync(dto);
+
+            return StatusCode(resp.StatusCode, resp);
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] UserLoginDTO dto)
+        {
+            var resp = await _userService.LoginAsync(dto); 
 
             return StatusCode(resp.StatusCode, resp);
         }
