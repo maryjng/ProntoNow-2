@@ -12,10 +12,12 @@ namespace Pronto.Controllers
     public class DeviceController : ControllerBase
     {
         private readonly DeviceRepository _deviceRepository;
+        private readonly ReportRepository _reportRepository;
 
-        public DeviceController(DeviceRepository deviceRepository)
+        public DeviceController(DeviceRepository deviceRepository, ReportRepository reportRepository)
         {
             _deviceRepository = deviceRepository;
+            _reportRepository = reportRepository;
         }
 
         [HttpGet("{id}")]
@@ -39,6 +41,13 @@ namespace Pronto.Controllers
         {
             var resp = await _deviceRepository.UpdateDeviceAsync(deviceId, deviceUpdateDTO);
 
+            return StatusCode(resp.StatusCode, resp);
+        }
+
+        [HttpGet("{deviceId}/reports")]
+        public async Task<IActionResult> GetReportsByDeviceId(int deviceId)
+        {
+            var resp = await _reportRepository.GetReportsByDeviceIdAsync(deviceId);
             return StatusCode(resp.StatusCode, resp);
         }
     }
