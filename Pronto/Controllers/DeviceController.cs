@@ -45,10 +45,10 @@ namespace Pronto.Controllers
         }
 
         [HttpGet]
-        // GET all devices for a User
-        public async Task<IActionResult> GetDevicesByUserId([FromQuery] int userId)
+        // GET all devices for a Business
+        public async Task<IActionResult> GetDevicesByBusinessId([FromQuery] int businessId)
         {
-            var resp = await _deviceRepository.GetDevicesByUserIdAsync(userId);
+            var resp = await _deviceRepository.GetDevicesByBusinessIdAsync(businessId);
             return StatusCode(resp.StatusCode, resp);
         }
 

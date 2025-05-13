@@ -52,11 +52,14 @@ public class Program
                     services.AddScoped<IDatabaseHelper, DatabaseHelper>();
                     services.AddScoped<IUserRepository, UserRepository>();
                     services.AddScoped<IUserService, UserService>();
+                    services.AddScoped<IDeviceRepository, DeviceRepository>();
+                    services.AddScoped<IBusinessRepository, BusinessRepository>();
+                    services.AddScoped<IReportRepository, ReportRepository>();
+
                     services.AddScoped<IPasswordHasherService, PasswordHasherService>();
                     services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 
-                    services.AddControllers();
                 });
 
                 webBuilder.Configure(app =>

@@ -8,7 +8,7 @@ namespace Pronto.Repositories.Interfaces
         Task<ApiResponse<Device>> CreateDeviceAsync(Device device);
         Task<ApiResponse<Device>> GetDeviceByIdAsync(int deviceId);
         Task<ApiResponse<Device>> UpdateDeviceAsync(int deviceId, DeviceUpdateDTO updatedDeviceDTO);
-        Task<ApiResponse<IEnumerable<Device>>> GetDevicesByUserIdAsync(int userId);
+        Task<ApiResponse<IEnumerable<Device>>> GetDevicesByBusinessIdAsync(int businessId);
 
     }
 }
