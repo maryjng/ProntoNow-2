@@ -109,5 +109,30 @@ namespace Pronto.Repositories
                 StatusCode = 200
             };
         }
+
+        public async Task<ApiResponse<IEnumerable<Device>>> GetDevicesByUserIdAsync(int userId)
+        {
+            using var connection = _databaseHelper.CreateConnection();
+            var sql = "SELECT * FROM device WHERE userId = @userId";
+
+            var devices = (await connection.QueryAsync<Device>(sql, new { UserId = userId })).ToList();
+
+            if (devices == null || !devices.Any())
+            {
+                return new ApiResponse<IEnumerable<Device>>
+                {
+                    Success = false,
+                    ErrorMessage = "No devices found for the given user ID.",
+                    StatusCode = 404
+                };
+            }
+
+            return new ApiResponse<IEnumerable<Device>>
+            {
+                Success = true,
+                Data = devices,
+                StatusCode = 200
+            };
+        }
     }
 }

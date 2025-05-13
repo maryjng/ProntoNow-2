@@ -9,5 +9,7 @@ namespace Pronto.Repositories.Interfaces
         Task<ApiResponse<Report>> GetReportByIdAsync(int reportId);
         Task<ApiResponse<Report>> UpdateReportAsync(int reportId, ReportUpdateDTO reportUserDTO);
         Task<ApiResponse<IEnumerable<Report>>> GetReportsByDeviceIdAsync(int deviceId);
+        Task<ApiResponse<IEnumerable<Report>>> GetReportsByUserIdAsync(int userId);
+
     }
 }

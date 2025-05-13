@@ -141,5 +141,29 @@ namespace Pronto.Repositories
             };
         }
 
+        public async Task<ApiResponse<IEnumerable<Report>>> GetReportsByUserIdAsync(int userId)
+        {
+            using var connection = _databaseHelper.CreateConnection();
+            var sql = "SELECT * FROM report WHERE userId = @userId";
+
+            var reports = (await connection.QueryAsync<Report>(sql, new { UserId = userId })).ToList();
+
+            if (reports == null || !reports.Any())
+            {
+                return new ApiResponse<IEnumerable<Report>>
+                {
+                    Success = false,
+                    ErrorMessage = "No reports found for the given user ID.",
+                    StatusCode = 404
+                };
+            }
+
+            return new ApiResponse<IEnumerable<Report>>
+            {
+                Success = true,
+                Data = reports,
+                StatusCode = 200
+            };
+        }
     }
 }

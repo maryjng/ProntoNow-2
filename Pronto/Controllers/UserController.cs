@@ -3,6 +3,7 @@ using Pronto.Repositories.Interfaces;
 using Pronto.DTOs;
 using Pronto.Services;
 using Microsoft.AspNetCore.Authorization;
+using Pronto.Repositories;
 
 namespace Pronto.Controllers
 {
@@ -12,11 +13,15 @@ namespace Pronto.Controllers
     {
         private readonly IUserService _userService;
         private readonly IUserRepository _userRepository;
+        private readonly IReportRepository _reportRepository;
+        private readonly IDeviceRepository _deviceRepository;
 
-        public UserController(IUserService userService, IUserRepository userRepository)
+        public UserController(IUserService userService, IUserRepository userRepository, IReportRepository reportRepository, IDeviceRepository deviceRepository)
         {
             _userService = userService;
             _userRepository = userRepository;
+            _reportRepository = reportRepository;
+            _deviceRepository = deviceRepository;
         }
 
         [HttpGet("{id}")]
@@ -51,6 +56,22 @@ namespace Pronto.Controllers
 
             return StatusCode(resp.StatusCode, resp);
         }
+
+        // [HttpGet("{userId}/reports")]
+        // [Authorize]
+        // public async Task<IActionResult> GetReportsByUserId(int userId)
+        // {
+        //     var resp = await _reportRepository.GetReportsByUserIdAsync(userId);
+        //     return StatusCode(resp.StatusCode, resp);
+        // }
+
+        // [HttpGet("{userId}/devices")]
+        // [Authorize]
+        // public async Task<IActionResult> GetDevicesByUserId(int userId)
+        // {
+        //     var resp = await _deviceRepository.GetDevicesByUserIdAsync(userId);
+        //     return StatusCode(resp.StatusCode, resp);
+        // }
 
     }
 }

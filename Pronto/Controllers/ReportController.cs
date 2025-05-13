@@ -4,6 +4,7 @@ using Pronto.Models;
 using Pronto.Repositories;
 using Pronto.DTOs;
 using Pronto.Repositories.Interfaces;
+using System.Threading.Tasks;
 
 namespace Pronto.Controllers
 {
@@ -41,5 +42,24 @@ namespace Pronto.Controllers
 
             return StatusCode(resp.StatusCode, resp);
         }
+
+        [HttpGet]
+        //GET all reports given a User OR Device
+        public async Task<IActionResult> GetReports([FromQuery] int? userId,[FromQuery] int? deviceId)
+        {
+            if (userId.HasValue)
+            {
+                var resp = await _reportRepository.GetReportsByUserIdAsync(userId.Value);
+                return StatusCode(resp.StatusCode, resp);
+            }
+            else if (deviceId.HasValue)
+            {
+                var resp = await _reportRepository.GetReportsByDeviceIdAsync(deviceId.Value);
+                return StatusCode(resp.StatusCode, resp);
+            }
+
+            return BadRequest("You must provide either a userId or a deviceId.");
+        }
+        
     }
 }
