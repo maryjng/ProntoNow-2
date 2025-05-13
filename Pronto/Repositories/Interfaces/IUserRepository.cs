@@ -8,6 +8,6 @@ namespace Pronto.Repositories.Interfaces
         Task<ApiResponse<User>> CreateUserAsync(User user);
         Task<User?> GetUserByEmailAsync(string email);
         Task<ApiResponse<User>> GetUserByIdAsync(int userId);
-        Task<ApiResponse<User>> UpdateUserAsync(int userId, UserUpdateDTO updatedUserDTO);
+        Task UpdateUserAsync(User user);
     }
 }

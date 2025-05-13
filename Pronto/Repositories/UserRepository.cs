@@ -86,53 +86,13 @@ namespace Pronto.Repositories
             };
         }
 
-        public async Task<ApiResponse<User>> UpdateUserAsync(int userId, UserUpdateDTO updatedUserDTO)
+        public async Task UpdateUserAsync(User user)
         {
             using var connection = _databaseHelper.CreateConnection();
-            var userExists = await connection.QuerySingleOrDefaultAsync<User>("SELECT * FROM user WHERE UserId=@UserId", new { UserId = userId });
-
-            if (userExists == null)
-            {
-                return new ApiResponse<User>
-                {
-                    Success = false,
-                    ErrorMessage = "User not found.",
-                    StatusCode = 404
-                };
-            }
-
-            userExists.Email = updatedUserDTO.Email ?? userExists.Email;
-            userExists.PasswordHash = updatedUserDTO.PasswordHash ?? userExists.PasswordHash;
-            userExists.BusinessId = updatedUserDTO.BusinessId ?? userExists.BusinessId;
-
-            var sql = @"UPDATE user SET BusinessId = @BusinessId, Email = @Email, PasswordHash = @PasswordHash WHERE UserId = @UserId AND (BusinessId != @BusinessId OR Email != @Email OR PasswordHash != @PasswordHash)";
-
-            var rowsAffected = await connection.ExecuteAsync(sql, userExists);
-
-            if (rowsAffected == 0)
-            {
-                return new ApiResponse<User>
-                {
-                    Success = false,
-                    ErrorMessage = "No changes were made. The data was already up-to-date.",
-                    StatusCode = 200
-                };
-            }
-
-            var updatedUserWithoutPassword = new User
-            {
-                UserId = userExists.UserId,
-                BusinessId = userExists.BusinessId,
-                Email = userExists.Email,
-                CreatedAt = userExists.CreatedAt,
-            }; // do not include PasswordHash field in return user
-
-            return new ApiResponse<User>
-            {
-                Success = true,
-                Data = updatedUserWithoutPassword,
-                StatusCode = 200
-            };
+            var sql = @"UPDATE user 
+                SET Email = @Email, PasswordHash = @PasswordHash, BusinessId = @BusinessId
+                WHERE userId = @userId";
+            await connection.ExecuteAsync(sql, user);
         }
     }
 }

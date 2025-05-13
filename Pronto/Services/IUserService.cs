@@ -7,5 +7,6 @@ namespace Pronto.Services
     {
         Task<ApiResponse<User>> RegisterUserAsync(UserRegistrationDTO userDto);
         Task<ApiResponse<AuthResultDTO>> LoginAsync(UserLoginDTO userLoginDto);
+        Task<ApiResponse<User>> UpdateUserAsync(int userId, UserUpdateDTO userUpdateDto);
     }
 }

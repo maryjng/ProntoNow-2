@@ -69,7 +69,61 @@ namespace Pronto.Services
                 },
                 StatusCode = 200
             };
-
         }
+
+        public async Task<ApiResponse<User>> UpdateUserAsync(int userId, UserUpdateDTO dto)
+        {
+            var resp = await _userRepository.GetUserByIdAsync(userId);
+            if (!resp.Success || resp.Data == null)
+            {
+                return new ApiResponse<User>
+                {
+                    Success = false,
+                    ErrorMessage = "User not found.",
+                    StatusCode = 404
+                };
+            }
+
+            var user = resp.Data;
+
+
+            if ((dto.Email != null || dto.Password != null) && string.IsNullOrEmpty(dto.CurrentPassword))
+            {
+                return new ApiResponse<User>
+                {
+                    Success = false,
+                    ErrorMessage = "Current password required to change email or password.",
+                    StatusCode = 400
+                };
+            }
+
+            if (!string.IsNullOrEmpty(dto.CurrentPassword))
+            {
+                var validPassword = _passwordHasherService.VerifyPassword(dto.CurrentPassword, user.PasswordHash);
+                if (!validPassword)
+                {
+                    return new ApiResponse<User>
+                    {
+                        Success = false,
+                        ErrorMessage = "Incorrect current password.",
+                        StatusCode = 401
+                    };
+                }
+            }
+
+            if (!string.IsNullOrEmpty(dto.Email)) user.Email = dto.Email;
+            if (!string.IsNullOrEmpty(dto.Password)) user.PasswordHash = _passwordHasherService.HashPassword(dto.Password);
+            if (dto.BusinessId.HasValue) user.BusinessId = dto.BusinessId;
+
+            await _userRepository.UpdateUserAsync(user);
+
+            return new ApiResponse<User>
+            {
+                Success = true,
+                Data = user,
+                StatusCode = 200
+            };
+        }
+
     }
 }

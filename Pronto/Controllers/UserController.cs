@@ -52,26 +52,11 @@ namespace Pronto.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateUser(int userId, UserUpdateDTO userUpdateDTO)
         {
-            var resp = await _userRepository.UpdateUserAsync(userId, userUpdateDTO);
+            var resp = await _userService.UpdateUserAsync(userId, userUpdateDTO);
 
             return StatusCode(resp.StatusCode, resp);
         }
 
-        // [HttpGet("{userId}/reports")]
-        // [Authorize]
-        // public async Task<IActionResult> GetReportsByUserId(int userId)
-        // {
-        //     var resp = await _reportRepository.GetReportsByUserIdAsync(userId);
-        //     return StatusCode(resp.StatusCode, resp);
-        // }
-
-        // [HttpGet("{userId}/devices")]
-        // [Authorize]
-        // public async Task<IActionResult> GetDevicesByUserId(int userId)
-        // {
-        //     var resp = await _deviceRepository.GetDevicesByUserIdAsync(userId);
-        //     return StatusCode(resp.StatusCode, resp);
-        // }
 
     }
 }
