@@ -21,6 +21,7 @@ namespace Pronto.Controllers
             _reportRepository = reportRepository;
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDevice(int id)
         {
