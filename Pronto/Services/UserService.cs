@@ -84,7 +84,7 @@ namespace Pronto.Services
                 };
             }
 
-            var user = resp.Data;
+            var user = resp.Data; //probably should fix the need for this 
 
 
             if ((dto.Email != null || dto.Password != null) && string.IsNullOrEmpty(dto.CurrentPassword))

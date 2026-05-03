@@ -4,6 +4,7 @@ using Pronto.Models;
 using Pronto.Repositories;
 using Pronto.DTOs;
 using Pronto.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Pronto.Controllers
 {
@@ -46,6 +47,7 @@ namespace Pronto.Controllers
 
         [HttpGet]
         // GET all devices for a Business
+        // like api/devices?businessId=1
         public async Task<IActionResult> GetDevicesByBusinessId([FromQuery] int businessId)
         {
             var resp = await _deviceRepository.GetDevicesByBusinessIdAsync(businessId);

@@ -5,7 +5,7 @@ namespace Pronto.Models
 {
     public class Report
     {
-        [JsonIgnore] public int ReportId { get; set; }
+        public int ReportId { get; set; }
         public int UserId { get; set; }
         public int DeviceId { get; set; }
         public int BusinessId { get; set; }
